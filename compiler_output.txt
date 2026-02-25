@@ -1,0 +1,8 @@
+
+> placement-next@1.0.0 type-check C:\Users\ACER\OneDrive\Desktop\PlacementProject\PlacementProject
+> tsc --noEmit
+
+.next/dev/types/routes.d.ts(138,1): error TS1434: Unexpected keyword or identifier.
+.next/dev/types/routes.d.ts(138,15): error TS1128: Declaration or statement expected.
+.next/dev/types/routes.d.ts(141,1): error TS1128: Declaration or statement expected.
+ ELIFECYCLE  Command failed with exit code 1.

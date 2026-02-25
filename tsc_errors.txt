@@ -1,0 +1,9 @@
+.next/types/validator.ts(368,39): error TS2306: File 'C:/Users/ACER/OneDrive/Desktop/PlacementProject/PlacementProject/app/api/admin/kyc-verification/route.ts' is not a module.
+app/api/jobs/[id]/route.ts(212,76): error TS2365: Operator '>' cannot be applied to types 'boolean' and 'number'.
+app/api/jobs/[id]/route.ts(224,68): error TS2339: Property 'resumeUpload' does not exist on type '{ id: string; branch: EngineeringBranch | null; batch: string | null; activeBacklogs: boolean; resume: string | null; cgpa: number | null; kycStatus: KYCStatus; }'.
+app/api/profile/route.ts(153,13): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "UNDER_REVIEW" | "INCOMPLETE"' and '"VERIFIED"' have no overlap.
+app/jobs/[id]/page.tsx(521,25): error TS2353: Object literal may only specify known properties, and 'minCGPA' does not exist in type 'JobData'.
+components/documents-form.tsx(9,26): error TS2307: Cannot find module '@/hooks/use-toast' or its corresponding type declarations.
+components/steps/college-id-step.tsx(107,42): error TS2322: Type '{ url: string; name: string; } | undefined' is not assignable to type 'File | null | undefined'.
+  Object literal may only specify known properties, and 'url' does not exist in type 'File'.
+lib/r2-storage.ts(110,11): error TS18047: 'r2Client' is possibly 'null'.

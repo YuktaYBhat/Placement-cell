@@ -1,0 +1,15 @@
+[dotenv@17.2.3] injecting env (17) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Testing prisma.user.findFirst()...
+Prisma Error: 
+Invalid `prisma.user.findFirst()` invocation in
+C:\Users\ACER\OneDrive\Desktop\PlacementProject\PlacementProject\verify-prisma.ts:9:40
+
+  6 async function test() {
+  7     try {
+  8         console.log("Testing prisma.user.findFirst()...")
+→ 9         const user = await prisma.user.findFirst(
+
+Error Code: ECONNREFUSED
+Error Meta: {
+  "modelName": "User"
+}

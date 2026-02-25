@@ -1,0 +1,828 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id                String             @id @default(cuid())
+  name              String?
+  email             String             @unique
+  emailVerified     DateTime?          @map("email_verified")
+  image             String?
+  password          String?
+  role              UserRole           @default(STUDENT)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  accounts          Account[]
+  applications      Application[]
+  document          Document?
+  eventAttendees    EventAttendee[]    @relation("EventAttendees")
+  notifications     Notification[]     @relation("UserNotifications")
+  placements        Placement[]
+  profile           Profile?
+  pushSubscriptions PushSubscription[]
+  createdEvents     ScheduleEvent[]    @relation("CreatedEvents")
+  sessions          Session[]
+  roundAttendances  RoundAttendance[]
+
+  fcmToken          String?            @map("fcm_token")
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("email_verification_tokens")
+}
+
+model Profile {
+  id                      String             @id @default(cuid())
+  userId                  String             @unique @map("user_id")
+  isComplete              Boolean            @default(false) @map("is_complete")
+  completionStep          Int                @default(1) @map("completion_step")
+  firstName               String?            @map("first_name")
+  middleName              String?            @map("middle_name")
+  lastName                String?            @map("last_name")
+  dateOfBirth             DateTime?          @map("date_of_birth")
+  dobDay                  String?            @map("dob_day")
+  dobMonth                String?            @map("dob_month")
+  dobYear                 String?            @map("dob_year")
+  gender                  Gender?
+  bloodGroup              BloodGroup?        @map("blood_group")
+  state                   String?
+  stateOfDomicile         String?            @map("state_of_domicile")
+  nationality             String?            @default("INDIAN")
+  category                String?
+  casteCategory           CasteCategory?     @map("caste_category")
+  profilePhoto            String?            @map("profile_photo")
+  email                   String?
+  studentEmail            String?            @map("student_email")
+  callingMobile           String?            @map("calling_mobile")
+  callingNumber           String?            @map("calling_number")
+  whatsappMobile          String?            @map("whatsapp_mobile")
+  whatsappNumber          String?            @map("whatsapp_number")
+  alternativeMobile       String?            @map("alternative_mobile")
+  altNumber               String?            @map("alt_number")
+  fatherFirstName         String?            @map("father_first_name")
+  fatherMiddleName        String?            @map("father_middle_name")
+  fatherLastName          String?            @map("father_last_name")
+  fatherName              String?            @map("father_name")
+  fatherDeceased          Boolean            @default(false) @map("father_deceased")
+  fatherMobile            String?            @map("father_mobile")
+  fatherEmail             String?            @map("father_email")
+  fatherOccupation        String?            @map("father_occupation")
+  motherFirstName         String?            @map("mother_first_name")
+  motherMiddleName        String?            @map("mother_middle_name")
+  motherLastName          String?            @map("mother_last_name")
+  motherName              String?            @map("mother_name")
+  motherDeceased          Boolean            @default(false) @map("mother_deceased")
+  motherMobile            String?            @map("mother_mobile")
+  motherEmail             String?            @map("mother_email")
+  motherOccupation        String?            @map("mother_occupation")
+  currentHouse            String?            @map("current_house")
+  currentCross            String?            @map("current_cross")
+  currentArea             String?            @map("current_area")
+  currentDistrict         String?            @map("current_district")
+  currentCity             String?            @map("current_city")
+  currentState            String?            @map("current_state")
+  currentPincode          String?            @map("current_pincode")
+  currentAddress          String?            @map("current_address")
+  sameAsCurrent           Boolean            @default(false) @map("same_as_current")
+  permanentHouse          String?            @map("permanent_house")
+  permanentCross          String?            @map("permanent_cross")
+  permanentArea           String?            @map("permanent_area")
+  permanentDistrict       String?            @map("permanent_district")
+  permanentCity           String?            @map("permanent_city")
+  permanentState          String?            @map("permanent_state")
+  permanentPincode        String?            @map("permanent_pincode")
+  permanentAddress        String?            @map("permanent_address")
+  country                 String?            @default("INDIA")
+  tenthSchool             String?            @map("tenth_school")
+  tenthArea               String?            @map("tenth_area")
+  tenthDistrict           String?            @map("tenth_district")
+  tenthCity               String?            @map("tenth_city")
+  tenthSchoolName         String?            @map("tenth_school_name")
+  tenthAreaDistrictCity   String?            @map("tenth_area_district_city")
+  tenthPincode            String?            @map("tenth_pincode")
+  tenthState              String?            @map("tenth_state")
+  tenthBoard              Board?             @map("tenth_board")
+  tenthPassingYear        Int?               @map("tenth_passing_year")
+  tenthPassingMonth       String?            @map("tenth_passing_month")
+  tenthMarksType          MarksType?         @map("tenth_marks_type")
+  tenthPercentage         Float?             @map("tenth_percentage")
+  tenthSubjects           Int?               @map("tenth_subjects")
+  tenthTotalMarks         Int?               @map("tenth_total_marks")
+  tenthMarksOutOf1000     Int?               @map("tenth_marks_out_of_1000")
+  tenthMarksCard          String?            @map("tenth_marks_card")
+  academicLevel           String?            @map("academic_level")
+  hasCompletedTwelfth     Boolean            @default(false) @map("has_completed_twelfth")
+  twelfthSchool           String?            @map("twelfth_school")
+  twelfthArea             String?            @map("twelfth_area")
+  twelfthDistrict         String?            @map("twelfth_district")
+  twelfthCity             String?            @map("twelfth_city")
+  twelfthSchoolName       String?            @map("twelfth_school_name")
+  twelfthAreaDistrictCity String?            @map("twelfth_area_district_city")
+  twelfthPincode          String?            @map("twelfth_pincode")
+  twelfthState            String?            @map("twelfth_state")
+  twelfthBoard            Board?             @map("twelfth_board")
+  twelfthPassingYear      Int?               @map("twelfth_passing_year")
+  twelfthPassingMonth     String?            @map("twelfth_passing_month")
+  twelfthMarksType        MarksType?         @map("twelfth_marks_type")
+  twelfthPercentage       Float?             @map("twelfth_percentage")
+  twelfthSubjects         Int?               @map("twelfth_subjects")
+  twelfthTotalMarks       Int?               @map("twelfth_total_marks")
+  twelfthMarksOutOf1000   Int?               @map("twelfth_marks_out_of_1000")
+  twelfthMarksCard        String?            @map("twelfth_marks_card")
+  twelfthCbseSubjects     String?            @map("twelfth_cbse_subjects")
+  twelfthCbseMarks        String?            @map("twelfth_cbse_marks")
+  twelfthIcseMarks        String?            @map("twelfth_icse_marks")
+  hasCompletedDiploma     Boolean            @default(false) @map("has_completed_diploma")
+  diplomaCollege          String?            @map("diploma_college")
+  diplomaArea             String?            @map("diploma_area")
+  diplomaDistrict         String?            @map("diploma_district")
+  diplomaCity             String?            @map("diploma_city")
+  diplomaCollegeName      String?            @map("diploma_college_name")
+  diplomaAreaLocation     String?            @map("diploma_area_location")
+  diplomaCertificate      String?            @map("diploma_certificate")
+  diplomaCertificates     String?            @map("diploma_certificates")
+  diplomaSemesterSgpa     Json?              @map("diploma_semester_sgpa")
+  diplomaSemesters        Json?              @map("diploma_semesters")
+  diplomaYearMarks        Json?              @map("diploma_year_marks")
+  diplomaFirstYear        String?            @map("diploma_first_year")
+  diplomaSecondYear       String?            @map("diploma_second_year")
+  diplomaThirdYear        String?            @map("diploma_third_year")
+  diplomaPercentage       Float?             @map("diploma_percentage")
+  collegeName             String?            @default("SHRI DHARMASTHALA MANJUNATHESHWARA COLLEGE OF ENGINEERING AND TECHNOLOGY") @map("college_name")
+  collegeDistrict         String?            @default("DHARWAD") @map("college_district")
+  district                String?            @default("DHARWAD")
+  collegePincode          String?            @default("580002") @map("college_pincode")
+  pincode                 String?            @default("580002")
+  branch                  EngineeringBranch?
+  entryType               EntryType?         @map("entry_type")
+  seatCategory            SeatCategory?      @map("seat_category")
+  usn                     String?            @unique
+  libraryId               String?            @map("library_id")
+  residencyStatus         ResidencyStatus?   @map("residency_status")
+  hostelName              String?            @map("hostel_name")
+  hostelRoom              String?            @map("hostel_room")
+  roomNumber              String?            @map("room_number")
+  hostelFloor             String?            @map("hostel_floor")
+  floorNumber             String?            @map("floor_number")
+  city                    String?
+  localCity               String?            @map("local_city")
+  transportMode           TransportMode?     @map("transport_mode")
+  busRoute                String?            @map("bus_route")
+  batch                   String?            @default("2022 - 2026")
+  branchMentor            String?            @map("branch_mentor")
+  linkedinLink            String?            @map("linkedin_link")
+  githubLink              String?            @map("github_link")
+  leetcodeLink            String?            @map("leetcode_link")
+  resumeUpload            String?            @map("resume_upload")
+  semesters               Json?              @map("semesters")
+  semesterRecords         Json?              @map("semester_records")
+  semesterMarksCards      Json?              @map("semester_marks_cards")
+  failedSubjects          Json?              @map("failed_subjects")
+  clearedAfterFailure     Json?              @map("cleared_after_failure")
+  finalCgpa               Float?             @map("final_cgpa")
+  hasBacklogs             String?            @map("has_backlogs")
+  activeBacklogs          Boolean            @default(false) @map("active_backlogs")
+  backlogs                Json?              @map("backlogs")
+  backlogSubjects         Json?              @map("backlog_subjects")
+  linkedin                String?
+  github                  String?
+  leetcode                String?
+  portfolio               String?
+  codechef                String?
+  codeforces              String?
+  hackerrank              String?
+  resume                  String?
+  phone                   String?
+  alternatePhone          String?            @map("alternate_phone")
+  department              String?
+  course                  String?
+  specialization          String?
+  semester                Int?
+  year                    Int?
+  cgpa                    Float?
+  percentage              Float?
+  guardianName            String?            @map("guardian_name")
+  guardianPhone           String?            @map("guardian_phone")
+  guardianRelation        String?            @map("guardian_relation")
+  skills                  String[]           @default([])
+  certifications          String[]           @default([])
+  projects                Json?
+  internships             Json?
+  achievements            String[]           @default([])
+  hobbies                 String[]           @default([])
+  languages               String[]           @default([])
+  expectedSalary          Float?             @map("expected_salary")
+  preferredLocations      String[]           @default([]) @map("preferred_locations")
+  jobType                 JobType?           @map("job_type")
+  workMode                WorkMode?          @map("work_mode")
+  kycStatus               KYCStatus          @default(PENDING) @map("kyc_status")
+  verifiedBy              String?            @map("verified_by")
+  verifiedAt              DateTime?          @map("verified_at")
+  remarks                 String?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  collegeIdCard           String?            @map("college_id_card")
+  academicDocument        String?            @map("academic_document")
+  diplomaPincode          String?            @map("diploma_pincode")
+  diplomaState            String?            @map("diploma_state")
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model ScheduleEvent {
+  id           String          @id @default(cuid())
+  title        String
+  description  String?
+  date         DateTime
+  duration     Int // Duration in minutes
+  location     String?
+  type         EventType
+  company      String?
+  maxAttendees Int?
+  status       EventStatus     @default(SCHEDULED)
+  isVisible    Boolean         @default(true)
+
+  // Optional Job relation
+  jobId        String?         @map("job_id")
+  job          Job?            @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  // Relations
+  createdBy    String
+  creator      User            @relation("CreatedEvents", fields: [createdBy], references: [id], onDelete: Cascade)
+  attendees    EventAttendee[]
+
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  @@map("schedule_events")
+}
+
+model EventAttendee {
+  id        String         @id @default(cuid())
+  eventId   String         @map("event_id")
+  userId    String         @map("user_id")
+  status    AttendeeStatus @default(REGISTERED)
+  createdAt DateTime       @default(now()) @map("created_at")
+  event     ScheduleEvent  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User           @relation("EventAttendees", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@map("event_attendees")
+}
+
+model Job {
+  id              String        @id @default(cuid())
+  title           String
+  companyId       String?       @map("company_id")
+  company         Company?      @relation(fields: [companyId], references: [id])
+  companyName     String        @map("company_name")
+  companyLogo     String?       @map("company_logo")
+  description     String        @db.Text
+  location        String
+
+  // Job Category
+  category        JobCategory   @default(FTE)
+
+  // Tier System
+  tier            PlacementTier @default(TIER_3)
+  isDreamOffer    Boolean       @default(false) @map("is_dream_offer")
+
+  // Job Type
+  jobType         JobType       @map("job_type")
+  workMode        WorkMode      @map("work_mode")
+
+  // Eligibility Criteria
+  minCGPA         Float?        @map("min_cgpa")
+  allowedBranches String[]      @default([]) @map("allowed_branches")
+  eligibleBatch   String?       @map("eligible_batch")
+  maxBacklogs     Int?          @default(0) @map("max_backlogs")
+
+  // Salary Information
+  salary          Float? // In LPA
+  minSalary       Float?        @map("min_salary")
+  maxSalary       Float?        @map("max_salary")
+
+  // Skills and Requirements
+  requiredSkills  String[]      @default([]) @map("required_skills")
+  preferredSkills String[]      @default([]) @map("preferred_skills")
+
+  // Application Details
+  deadline        DateTime?
+  startDate       DateTime?     @map("start_date")
+  noOfPositions   Int?          @default(1) @map("no_of_positions")
+  googleFormUrl   String?       @map("google_form_url")
+
+  // Status
+  status          JobStatus     @default(ACTIVE)
+  isVisible       Boolean       @default(true) @map("is_visible")
+
+  // Relations
+  postedBy        String        @map("posted_by")
+  applications    Application[]
+  updates         JobUpdate[]
+  customFields    JobCustomField[]
+
+  // Round-based attendance relations
+  rounds           JobRound[]
+  driveSessions    DriveSession[]
+  roundAttendances RoundAttendance[]
+
+  // Schedule events linked to this job
+  scheduleEvents   ScheduleEvent[]
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@map("jobs")
+}
+
+model Application {
+  id            String    @id @default(cuid())
+  jobId         String    @map("job_id")
+  userId        String    @map("user_id")
+  appliedAt     DateTime  @default(now()) @map("applied_at")
+  resumeUsed    String?   @map("resume_used")
+  isRemoved     Boolean   @default(false) @map("is_removed")
+  removedAt     DateTime? @map("removed_at")
+  removedBy     String?   @map("removed_by")
+  removalReason String?   @map("removal_reason")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  job           Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses     JobApplicationResponse[]
+
+  @@unique([jobId, userId])
+  @@index([userId])
+  @@index([jobId])
+  @@map("applications")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  title     String
+  message   String           @db.Text
+  type      NotificationType
+  isRead    Boolean          @default(false) @map("is_read")
+  data        Json?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  scheduledAt DateTime?        @map("scheduled_at")
+  readAt      DateTime?        @map("read_at")
+  user        User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  files       NotificationFile[]
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model NotificationFile {
+  id             String       @id @default(cuid())
+  notificationId String       @map("notification_id")
+  fileName       String       @map("file_name")
+  fileUrl        String       @map("file_url")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@map("notification_files")
+}
+
+model Attendance {
+  id        String    @id @default(cuid())
+  studentId String    @map("student_id")
+  jobId     String?   @map("job_id")
+  eventId   String?   @map("event_id")
+  qrCode    String    @unique @map("qr_code")
+  scannedAt DateTime? @map("scanned_at")
+  scannedBy String?   @map("scanned_by")
+  location  String?
+  notes     String?   @db.Text
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([studentId])
+  @@index([jobId])
+  @@index([eventId])
+  @@index([qrCode])
+  @@map("attendances")
+}
+
+// =============================================
+// Round-Based Attendance System Models
+// =============================================
+
+// Dynamic rounds per job (Aptitude, Technical, GD, HR, Custom)
+model JobRound {
+  id        String  @id @default(cuid())
+  jobId     String  @map("job_id")
+  name      String  // e.g., "Aptitude", "Technical", "GD", "HR", or custom
+  order     Int     // 1, 2, 3... determines sequence
+  isRemoved Boolean @default(false) @map("is_removed")
+
+  job       Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  sessions  DriveSession[]
+  attendances RoundAttendance[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([jobId, order])
+  @@index([jobId])
+  @@map("job_rounds")
+}
+
+// Session per round - controls when QR scanning is active
+model DriveSession {
+  id        String        @id @default(cuid())
+  jobId     String        @map("job_id")
+  roundId   String        @map("round_id")
+  status    SessionStatus @default(ACTIVE)
+  startTime DateTime      @default(now()) @map("start_time")
+  endTime   DateTime?     @map("end_time")
+  createdBy String        @map("created_by") // Admin who created this session
+
+  job       Job              @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  round     JobRound         @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  attendances RoundAttendance[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([jobId])
+  @@index([roundId])
+  @@index([status])
+  @@map("drive_sessions")
+}
+
+// Round-based attendance per student
+model RoundAttendance {
+  id              String           @id @default(cuid())
+  userId          String           @map("user_id")
+  jobId           String           @map("job_id")
+  roundId         String           @map("round_id")
+  sessionId       String           @map("session_id")
+  markedByAdminId String           @map("marked_by_admin_id")
+  markedAt        DateTime         @default(now()) @map("marked_at")
+  status          AttendanceResult @default(ATTENDED)
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job     Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  round   JobRound     @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  session DriveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, roundId]) // One attendance per student per round
+  @@index([userId])
+  @@index([jobId])
+  @@index([roundId])
+  @@index([sessionId])
+  @@map("round_attendances")
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  logo        String?
+  website     String?
+  industry    String?
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  jobs        Job[]
+
+  @@map("companies")
+}
+
+model Placement {
+  id            String        @id @default(cuid())
+  userId        String        @map("user_id")
+  jobId         String        @map("job_id")
+  tier          PlacementTier
+  salary        Float
+  companyName   String        @map("company_name")
+  isException   Boolean       @default(false) @map("is_exception")
+  exceptionNote String?       @map("exception_note") @db.Text
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([tier])
+  @@map("placements")
+}
+
+model JobUpdate {
+  id        String   @id @default(cuid())
+  jobId     String   @map("job_id")
+  title     String
+  message   String   @db.Text
+  createdBy String   @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("job_updates")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+model DeadlineReminder {
+  id     String   @id @default(cuid())
+  jobId  String   @unique @map("job_id")
+  sentAt DateTime @default(now()) @map("sent_at")
+
+  @@map("deadline_reminders")
+}
+
+model Document {
+  id                   String    @id @default(cuid())
+  userId               String    @unique @map("user_id")
+  usn                  String?
+  cgpa                 Float?
+  tenthMarksCardLink   String?   @map("tenth_marks_card_link")
+  twelfthMarksCardLink String?   @map("twelfth_marks_card_link")
+  sem1Link             String?   @map("sem1_link")
+  sem2Link             String?   @map("sem2_link")
+  sem3Link             String?   @map("sem3_link")
+  sem4Link             String?   @map("sem4_link")
+  sem5Link             String?   @map("sem5_link")
+  sem6Link             String?   @map("sem6_link")
+  sem7Link             String?   @map("sem7_link")
+  sem8Link             String?   @map("sem8_link")
+  kycStatus            KYCStatus @default(PENDING) @map("kyc_status")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+enum UserRole {
+  STUDENT
+  RECRUITER
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum CasteCategory {
+  GEN
+  OBC
+  SC
+  ST
+}
+
+enum Board {
+  STATE
+  CBSE
+  ICSE
+}
+
+enum MarksType {
+  PERCENTAGE
+  SUBJECTS_TOTAL
+  OUT_OF_1000
+}
+
+enum EngineeringBranch {
+  CSE
+  ISE
+  ECE
+  EEE
+  ME
+  CE
+  AIML
+  DS
+}
+
+enum EntryType {
+  REGULAR
+  LATERAL
+}
+
+enum SeatCategory {
+  KCET
+  MANAGEMENT
+  COMEDK
+}
+
+enum ResidencyStatus {
+  HOSTELITE
+  LOCALITE
+}
+
+enum TransportMode {
+  COLLEGE_BUS
+  PRIVATE_TRANSPORT
+  PUBLIC_TRANSPORT
+  WALKING
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT
+  FREELANCE
+}
+
+enum WorkMode {
+  OFFICE
+  REMOTE
+  HYBRID
+  FLEXIBLE
+}
+
+enum KYCStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  INCOMPLETE
+}
+
+enum EventType {
+  INTERVIEW
+  TEST
+  GROUP_DISCUSSION
+  PRESENTATION
+  MEETING
+  WEBINAR
+}
+
+enum EventStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendeeStatus {
+  REGISTERED
+  ATTENDED
+  ABSENT
+  CANCELLED
+}
+
+enum JobCategory {
+  TRAINING_INTERNSHIP
+  INTERNSHIP
+  FTE
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
+enum NotificationType {
+  JOB_POSTED
+  JOB_UPDATED
+  JOB_DEADLINE_REMINDER
+  JOB_DEADLINE_EXTENDED
+  APPLICATION_STATUS
+  INTERVIEW_SCHEDULED
+  KYC_UPDATE
+  EVENT_REMINDER
+  PLACEMENT_UPDATE
+  SYSTEM
+}
+
+enum PlacementTier {
+  TIER_3 // <= 5 LPA
+  TIER_2 // > 5 LPA and <= 9 LPA  
+  TIER_1 // > 9 LPA
+  DREAM  // > 10 LPA, admin-decided
+}
+
+enum SessionStatus {
+  ACTIVE
+  TEMP_CLOSED
+  PERM_CLOSED
+}
+
+enum AttendanceResult {
+  ATTENDED
+  PASSED
+  FAILED
+}
+
+model JobCustomField {
+  id        String                   @id @default(cuid())
+  jobId     String                   @map("job_id")
+  label     String
+  type      CustomFieldType
+  required  Boolean                  @default(false)
+  options   Json?                    // Array of strings for Dropdown
+  createdAt DateTime                 @default(now()) @map("created_at")
+  updatedAt DateTime                 @updatedAt @map("updated_at")
+  job       Job                      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  responses JobApplicationResponse[]
+
+  @@map("job_custom_fields")
+}
+
+model JobApplicationResponse {
+  id            String         @id @default(cuid())
+  applicationId String         @map("application_id")
+  fieldId       String         @map("field_id")
+  value         String?        // Text value or URL for file
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  application   Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  field         JobCustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, fieldId])
+  @@map("job_application_responses")
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DROPDOWN
+  BOOLEAN
+  FILE_UPLOAD
+  TEXTAREA
+}
