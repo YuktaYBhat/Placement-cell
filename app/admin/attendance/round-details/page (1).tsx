@@ -75,8 +75,8 @@ interface AttendanceRecord {
 
 function RoundDetailsContent() {
     const searchParams = useSearchParams()
-    const jobId = searchParams?.get("jobId") || ""
-    const roundId = searchParams?.get("roundId") || ""
+    const jobId = searchParams?.get("jobId")
+    const roundId = searchParams?.get("roundId")
 
     const [attendances, setAttendances] = useState<AttendanceRecord[]>([])
     const [isLoading, setIsLoading] = useState(true)
